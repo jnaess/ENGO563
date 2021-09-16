@@ -48,18 +48,24 @@ class LS():
             #check if known or unknown
             if row[3] == "u":
                 #unknown name
-                self.u_list.append(row[0])
+                self.u_list.append(row[0]+"_E")
+                self.u_list.append(row[0]+"_N")
 
                 #add unknown values in order of x, y
                 self.x_0.append(row[1])
                 self.x_0.append(row[2])
             else: #then they are "n" --> knowns
                 #known name
-                self.datums.append(row[0])
+                self.datums.append(row[0]+"_E")
+                self.datums.append(row[0]+"_N")
 
                 #add known values in order of x, y
                 self.c.append(row[1])
                 self.c.append(row[2])
+                
+        self.x_0 = t(mat(self.x_0))
+        self.c = t(mat(self.c))
+        
     def find_col(self, dimension, point_name, li = "u"):
         """
         Desc:
