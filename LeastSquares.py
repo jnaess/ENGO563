@@ -33,6 +33,7 @@ class LS():
             self.x_0 (initial guesses of unknowns)
             self.c (constant values of knowns)
             self.datums (string list of knowns)
+            self.u # of unknowns
         """
         df = pd.read_csv(self.file_name, sep = ' ')
         #currently only formatted for 2D
@@ -65,6 +66,7 @@ class LS():
                 
         self.x_0 = t(mat(self.x_0))
         self.c = t(mat(self.c))
+        self.u = len(self.u_list)
         
     def find_col(self, dimension, point_name, li = "u"):
         """
