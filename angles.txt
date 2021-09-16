@@ -1,3 +1,4 @@
+From At To Degrees Minutes Seconds StDev[seconds]
 A P1 B 84 07 38.2 1.5
 P1 B A 37 46 34.9 1.5
 B A P1 58 05 44.1 1.5
