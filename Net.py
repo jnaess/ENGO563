@@ -14,7 +14,7 @@ class Network(LS):
     """
     Build to run the least squares adjustment and set up the overall network
     """
-    def __init__(self, models = [Delta()]):
+    def __init__(self, models):
         """
         Desc:
         Input:
@@ -85,21 +85,21 @@ class Network(LS):
 
         #set up N matrix
         
-        self.n_mat()
+        #self.n_mat()
         
-        self.misc =  self.l_0 - self.obs
+        #self.misc =  self.l_0 - self.obs
         
-        self.u = mm(t(self.A),mm(self.P,self.misc))
+        #self.u = mm(t(self.A),mm(self.P,self.misc))
 
-        self.S_hat = -mm(inv(self.N),self.u)
+        #self.S_hat = -mm(inv(self.N),self.u)
         
-        self.x_hat = self.x_0 + self.S_hat
+        #self.x_hat = self.x_0 + self.S_hat
         
-        self.v_hat = mm(self.A,self.S_hat) + self.misc 
+        #self.v_hat = mm(self.A,self.S_hat) + self.misc 
         
-        self.a_pri_hat = mm(t(self.v_hat),mm(self.P,self.v_hat))[0,0]/(self.n - len(self.x_0))
+        #self.a_pri_hat = mm(t(self.v_hat),mm(self.P,self.v_hat))[0,0]/(self.n - len(self.x_0))
         
-        self.cx_hat = self.a_pri_hat*inv(self.N)
+        #self.cx_hat = self.a_pri_hat*inv(self.N)
         
         
         
