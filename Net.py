@@ -80,14 +80,25 @@ class Network(LS):
         #set up weight matrix
         self.P = inv(self.Cl)
         
+        #_________________-begin LSA______________________
+        self.nonlinear_LSA()
+        
         #l_0
-        self.obs_0()
+        #self.obs_0()
+        
+        #misclosure
+        #self.w_0 =  self.l_0 - self.obs
 
+        #S_hat
+        #self.S_hat = -mm(inv(mm(t(self.A),mm(self.P,self.A))),mm(t(self.A),mm(self.P,self.w_0)))
+        
+        #x_hat
+        #self.x_hat = self.x_0 + self.S_hat
         #set up N matrix
         
         #self.n_mat()
         
-        #self.misc =  self.l_0 - self.obs
+        
         
         #self.u = mm(t(self.A),mm(self.P,self.misc))
 
@@ -111,6 +122,85 @@ class Network(LS):
         
         #correction vector
         #self.correction()
+        
+    def final_matrices(self):
+        """
+        Desc:
+            Once the LSA is completed then this generates all desired matrices for analysis
+        Input:
+        Output:
+            self.r_hat: residuals
+            self.l_hat: adjusted observations
+            self.a_post: a-posteriori variance factor
+            self.uvf: unit variance factor
+        """
+        self.r_hat = mm(self.A,self.S_hat) + self.w_0
+        self.l_hat = self.obs + self.r_hat
+        self.a_post = mm(t(self.r_hat),mm(self.P,self.r_hat)/(self.n-self.u))[0,0]
+        self.uvf = self.a_post / self.apriori
+        self.Cx = self.a_post*inv(mm(t(self.A),mm(self.P,self.A)))
+        self.Cl = mm(self.A,mm(self.Cx,t(self.A)))
+        self.Cr = self.a_post*inv(self.P)-self.Cl
+        
+    def nonlinear_LSA(self):
+        """
+        Desc:
+            Iterates a nonlinear LSA, checking whether criterea was met. Once it was met then it constructs the final matrices for analysis
+        Input:
+        Output:
+        
+        """
+        self.not_met = True
+        
+        i = 0
+        
+        while self.not_met:
+            #l_0
+            self.obs_0()
+
+            #misclosure
+            self.w_0 =  self.l_0 - self.obs
+
+            #S_hat
+            self.S_hat = -mm(inv(mm(t(self.A),mm(self.P,self.A))),mm(t(self.A),mm(self.P,self.w_0)))
+
+            #x_hat
+            self.x_hat = self.x_0 + self.S_hat
+            
+            #update x_0
+            self.x_0 = self.x_hat
+            
+            i = i + 1
+            
+            self.convergence(i)
+        
+        print("LSA passed in: " + str(i) + " iterations")
+        self.final_matrices()
+        
+    def convergence(self,i):
+        """
+        Desc:
+            Checks based on this criterea, if convergence is met then sets self.not_met to False
+        Input:
+            i: number of iterations (for simple # of ter break)
+        Output:
+            self.not_met --> False if the criterea is met
+        """
+        #max 10 iterations
+        if i > 1:
+            self.not_met = False
+            
+        #minimum self.S_hat to be under .001m
+        not_under = False
+        for key in self.S_hat:
+            if key[0,0] > .0001:
+                #this means the criterea was not met for atleast one of the unknowns
+                not_under = True
+
+        if not not_under:
+            #then all things were under .0001m in change and therefore the criterea was met
+            self.not_met = False
+        
         
     def covariance(self):
         """
