@@ -19,32 +19,23 @@ class Network(LS):
         Desc:
         Input:
             models: list of models that have been initialized with 
-                data. Must contain the save number of columns in their a 
+                data. Must contain the same number of columns in their a 
                 matrix (predefined by LS())
         Output:
         """
         LS.__init__(self)
         self.models = models
+        
         self.initialize_variables()
+        
+        #_________________begin LSA______________________
+        self.nonlinear_LSA()
         
         
     def initialize_variables(self):
         """
         Desc:
-            initializes major variables (combining matrices and stuff)
-            
-                    [E,N,H]
-        ASCM2      -9393.784, 5660608.432, 1110.234
-        ASCM1: -9904.726, 5659098.669, 1100.076 [-9903.780, 5659098.252, 1099.627]
-        SA10: -9292.095, 5660358.617, 1136.040
-        UCAL: -9378.481, 5660425.221, 1135.642
-        BASE: -9245.156, 5660419.921, 1111.683
-        C1: -9484.624, 5660402.217, 1111.207
-        C2: -9492.719, 5660518.107, 1112.521
-        C3: -9428.997, 5660514.752, 1114.125
-        N: E, N, 1135.959
-        S: E, N, 1135.887
-        
+            initializes major variables (combining matrices and stuff)        
         
         Input:
         Output:
@@ -80,49 +71,7 @@ class Network(LS):
         #set up weight matrix
         self.P = inv(self.Cl)
         
-        #_________________-begin LSA______________________
-        self.nonlinear_LSA()
-        
-        #l_0
-        #self.obs_0()
-        
-        #misclosure
-        #self.w_0 =  self.l_0 - self.obs
-
-        #S_hat
-        #self.S_hat = -mm(inv(mm(t(self.A),mm(self.P,self.A))),mm(t(self.A),mm(self.P,self.w_0)))
-        
-        #x_hat
-        #self.x_hat = self.x_0 + self.S_hat
-        #set up N matrix
-        
-        #self.n_mat()
-        
-        
-        
-        #self.u = mm(t(self.A),mm(self.P,self.misc))
-
-        #self.S_hat = -mm(inv(self.N),self.u)
-        
-        #self.x_hat = self.x_0 + self.S_hat
-        
-        #self.v_hat = mm(self.A,self.S_hat) + self.misc 
-        
-        #self.a_pri_hat = mm(t(self.v_hat),mm(self.P,self.v_hat))[0,0]/(self.n - len(self.x_0))
-        
-        #self.cx_hat = self.a_pri_hat*inv(self.N)
-        
-        
-        
-        #set up first Cx
-        #self.cx_mat()
-        
-        #set up first misclosure
-        #self.w_mat()
-        
-        #correction vector
-        #self.correction()
-        
+                
     def final_matrices(self):
         """
         Desc:
@@ -133,6 +82,9 @@ class Network(LS):
             self.l_hat: adjusted observations
             self.a_post: a-posteriori variance factor
             self.uvf: unit variance factor
+            self.Cx (also Cs): 
+            self.Cl:
+            self.Cr:
         """
         self.r_hat = mm(self.A,self.S_hat) + self.w_0
         self.l_hat = self.obs + self.r_hat
@@ -230,11 +182,6 @@ class Network(LS):
             temp.append(obs.A)
         self.A = np.vstack(temp)
         
-        
-        
-        #___________needs updating to merge all matrices______
-        #self.A = self.models[0].A
-        
     def n_mat(self):
         """
         """
@@ -250,8 +197,6 @@ class Network(LS):
 
         """
         #adds constants and unknowns together and solves for values
-        #temp = np.vstack((self.c, self.x_0))
-        #self.w = mm(self.A,temp) - self.obs
         self.w = mm(self.A,self.x_0) - self.obs
            
            #____________for non linear this will need to change______
@@ -267,7 +212,11 @@ class Network(LS):
         
     def obs_0(self):
         """
-        Assembles l_obs from each matrix
+        Desc:
+            Assembles l_obs from each matrix
+        Input:
+        Output:
+            self.l_0 constructed
         """
         
         self.l_0 = mat(np.zeros((self.n, 1)))

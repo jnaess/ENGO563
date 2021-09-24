@@ -8,16 +8,19 @@ class LS():
     """
         Holds the universal values needed to integrate the different LS adjustments into one
     """
-    def __init__(self, file_name = "coords.txt"):
+    def __init__(self, file_name = "coords.txt", debugging = False):
         """
         Desc:
             reads in the list of knowns and unknowns and assigns their values. Will construct design matrix, etc. based off of these
         Input:
+            file_name where the knowns and unknowns are defined
+            debugging, T/F. If true then more printing of stuff happens
         Output:
             sets up u_list (predefined in here)
             sets up number of unknowns (self.u)
             
         """
+        self.debugging = debugging
         self.file_name = file_name
         self.read_2D()
 
@@ -26,6 +29,7 @@ class LS():
         Desc:
             reads in the 2D set of points and assigns values
             expects format of [name easting northing known/unknown]
+            more specifically: [Point X[m] Y[m] Known[n]/Unknown[u]]
         Input:
             self.file_name
         Output:
@@ -72,6 +76,7 @@ class LS():
         """
         Desc:
             returns the column index of the desired points
+            expects 'n' for known and 'u' for unknown
             **all values must be in caps**
         Input:
             u_list, list of strings of "pointname_dimension"
@@ -95,5 +100,7 @@ class LS():
             else:
                 index = index + 1
         
-        print(point_name + " Could not be found")
+        #debugging stuff
+        if self.debugging:
+            print(point_name + " Could not be found")
         return -1
