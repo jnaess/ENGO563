@@ -3,8 +3,9 @@ from numpy import matrix as mat, matmul as mm
 import math as m
 import numpy as np
 import pandas as pd
+from Tools import Tools
 
-class LS():
+class LS(Tools):
     """
         Holds the universal values needed to integrate the different LS adjustments into one
     """
@@ -21,6 +22,9 @@ class LS():
             sets up number of unknowns (self.u)
             
         """
+        #brings in the tool files for use
+        Tools.__init__(self)
+        
         self.debugging = debugging
         self.file_name = file_name
         self.read_2D()

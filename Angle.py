@@ -179,27 +179,27 @@ class Angle(LS):
                 #self.A[i,to_col] = delta + 1
                 
                 #(1)
-                self.A[i,at_col] = ((n_to - n_at)/((e_to-e_at)**2+(n_to-n_at)**2))-((n_from-n_at)/((e_from-e_at)**2+(n_from-n_at)**2))
+                self.A[i,at_col] = (((n_to - n_at)/((e_to-e_at)**2+(n_to-n_at)**2))-((n_from-n_at)/((e_from-e_at)**2+(n_from-n_at)**2)))
                 
                 #(2)
-                self.A[i,at_col+1] = (-(e_to - e_at)/((e_to-e_at)**2+(n_to-n_at)**2))+((e_from-e_at)/((e_from-e_at)**2+(n_from-n_at)**2))
+                self.A[i,at_col+1] = ((-(e_to - e_at)/((e_to-e_at)**2+(n_to-n_at)**2))+((e_from-e_at)/((e_from-e_at)**2+(n_from-n_at)**2)))
                 
             if not from_const:
                 
                 #(3)
-                self.A[i,from_col] = (n_from-n_at)/((e_from-e_at)**2+(n_from-n_at)**2)
+                self.A[i,from_col] = ((n_from-n_at)/((e_from-e_at)**2+(n_from-n_at)**2))
                 
                 #(4)
-                self.A[i,from_col+1] = -(e_from-e_at)/((e_from-e_at)**2+(n_from-n_at)**2)         
+                self.A[i,from_col+1] = (-(e_from-e_at)/((e_from-e_at)**2+(n_from-n_at)**2))         
                 
             if not to_const:
                 #self.A[i,to_col] = delta + 1
                 
                 #(5)
-                self.A[i,to_col] = -(n_to-n_at)/((e_to-e_at)**2+(n_to-n_at)**2)
+                self.A[i,to_col] = (-(n_to-n_at)/((e_to-e_at)**2+(n_to-n_at)**2))
                 
                 #(6)
-                self.A[i,to_col+1] = (e_to-e_at)/((e_to-e_at)**2+(n_to-n_at)**2)
+                self.A[i,to_col+1] = ((e_to-e_at)/((e_to-e_at)**2+(n_to-n_at)**2))
             #_____________________________________________________________________________
             i = i + 1
                     
@@ -211,7 +211,8 @@ class Angle(LS):
         Output:
             self.errs
         """
-        self.errs = mat(self.df[self.d_error]).transpose()
+        #converts from arc seconds to radians
+        self.errs = np.radians(mat(self.df[self.d_error]).transpose()/3600)
         
     def omega(self, fro_e, fro_n, to_e, to_n):
         """
@@ -320,7 +321,9 @@ class Angle(LS):
                         #this is where the values are generated______________________________________
             #it is important that files are formatted as X and then Y so that we can find the X column 
             #and autopopulate the Y column next to it
-            ang = m.atan((n_to-n_at)/(e_to-e_at))-m.atan((n_from-n_at)/(e_from-e_at))
+            
+            
+            ang = m.atan((n_to-n_at)/(e_to-e_at)) - m.atan((n_from-n_at)/(e_from-e_at))
             
             if ang < 0:
                 ang = ang + m.pi

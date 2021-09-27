@@ -10,6 +10,8 @@ from LeastSquares import LS
 from Level import Delta
 
 
+
+
 class Network(LS):
     """
     Build to run the least squares adjustment and set up the overall network
@@ -66,7 +68,7 @@ class Network(LS):
         self.covariance()
         
         #set up apriori
-        self.apriori = 1.5
+        self.apriori = m.radians(1.5/3600)
         
         #set up weight matrix
         self.P = self.apriori**2 * inv(self.Cl)
@@ -90,9 +92,15 @@ class Network(LS):
         self.l_hat = self.obs + self.r_hat
         self.a_post = mm(t(self.r_hat),mm(self.P,self.r_hat)/(self.n-self.u))[0,0]
         self.uvf = self.a_post**2 / self.apriori**2
+        
         self.Cx = self.a_post**2 * inv(mm(t(self.A),mm(self.P,self.A)))
+        self.plot_mat(self.Cx, "Covariance Matrix of Unknowns")
+        
         self.Cl = mm(self.A,mm(self.Cx,t(self.A)))
+        self.plot_mat(self.Cl, "Covariance Matrix of Measurements")
+        
         self.Cr = self.a_post*inv(self.P)-self.Cl
+        self.plot_mat(self.Cr, "Covariance Matrix of Residuals")
         
     def nonlinear_LSA(self):
         """
@@ -112,9 +120,9 @@ class Network(LS):
         
         while self.not_met:
             i = i + 1
-            print("LSA iteration: " + str(i))
-            print("x_0: ")
-            print(LS.x_0)
+            #print("LSA iteration: " + str(i))
+            #print("x_0: ")
+            #print(LS.x_0)
             
             #l_0
             self.obs_0()
@@ -130,8 +138,8 @@ class Network(LS):
             
             self.S_hat = -mm(inv(mm(t(self.A),mm(self.P,self.A))),mm(t(self.A),mm(self.P,self.w_0)))
 
-            print("l_0: ")
-            print(self.l_0)
+            #print("l_0: ")
+            #print(self.l_0)
             
             #x_hat
             self.x_hat = LS.x_0 + self.S_hat
@@ -140,12 +148,12 @@ class Network(LS):
             #update x_0
             LS.x_0 = self.x_hat
           
-            print("S_hat:")
-            print(self.S_hat)
-            print("x_hat: ")
-            print(self.x_hat)
-            print("A: ")
-            print(self.A)
+            #print("S_hat:")
+            #print(self.S_hat)
+            #print("x_hat: ")
+            #print(self.x_hat)
+            #print("A: ")
+            #print(self.A)
             
             
             
@@ -154,7 +162,7 @@ class Network(LS):
             
             self.convergence(i)
         
-        print("LSA passed in: " + str(i) + " iterations")
+        #print("LSA passed in: " + str(i) + " iterations")
         self.final_matrices()
         
     def convergence(self,i):
@@ -171,7 +179,7 @@ class Network(LS):
             self.not_met = False
             
         #minimum self.S_hat to be under .001m
-        """
+        
         not_under = False
         for key in self.S_hat:
             if abs(key[0,0]) > .0001:
@@ -180,7 +188,7 @@ class Network(LS):
 
         if not not_under:
             #then all things were under .0001m in change and therefore the criterea was met
-            self.not_met = False"""
+            self.not_met = False
         
         
     def covariance(self):
