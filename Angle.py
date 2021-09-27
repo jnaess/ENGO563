@@ -59,11 +59,11 @@ class Angle(LS):
         
         #Switch second error to radian error _______________
         self.df["StDev[rad]"] = np.radians(np.array(self.df["StDev[sec]"])/3600)
-        self.df = self.df.drop(columns = ["StDev[sec]"])
+        #self.df = self.df.drop(columns = ["StDev[sec]"])
         #_____________________________________________________
         
         #now formatted [From At To Radians StDev[rad]]
-        self.d_error = "StDev[rad]"
+        self.d_error = "StDev[sec]"
         self.d_symbol = "E"
         
         
@@ -133,8 +133,8 @@ class Angle(LS):
                 from_const = True
             else:
                 #sets easting and northing values from the froms
-                e_from = self.x_0[from_col,0]
-                n_from = self.x_0[from_col+1,0]
+                e_from = LS.x_0[from_col,0]
+                n_from = LS.x_0[from_col+1,0]
             
             to_col = self.find_col(self.d_symbol, tos[i])
             if to_col == -1:
@@ -145,8 +145,8 @@ class Angle(LS):
                 to_const = True
             else:
                 #set the easting and northing values of the 
-                e_to = self.x_0[to_col,0]
-                n_to = self.x_0[to_col+1,0]
+                e_to = LS.x_0[to_col,0]
+                n_to = LS.x_0[to_col+1,0]
                 
             at_col = self.find_col(self.d_symbol, ats[i])
             if at_col == -1:
@@ -157,8 +157,8 @@ class Angle(LS):
                 at_const = True
             else:
                 #set the easting and northing values of the 
-                e_at = self.x_0[at_col,0]
-                n_at = self.x_0[at_col+1,0]
+                e_at = LS.x_0[at_col,0]
+                n_at = LS.x_0[at_col+1,0]
                                                              
             #__________________________________________________________________________               
             #constants for this line    
@@ -275,8 +275,8 @@ class Angle(LS):
                 from_const = True
             else:
                 #sets easting and northing values from the froms
-                e_from = self.x_0[from_col,0]
-                n_from = self.x_0[from_col+1,0]
+                e_from = LS.x_0[from_col,0]
+                n_from = LS.x_0[from_col+1,0]
             
             to_col = self.find_col(self.d_symbol, tos[i])
             if to_col == -1:
@@ -287,8 +287,8 @@ class Angle(LS):
                 to_const = True
             else:
                 #set the easting and northing values of the 
-                e_to = self.x_0[to_col,0]
-                n_to = self.x_0[to_col+1,0]
+                e_to = LS.x_0[to_col,0]
+                n_to = LS.x_0[to_col+1,0]
                 
             at_col = self.find_col(self.d_symbol, ats[i])
             if at_col == -1:
@@ -299,8 +299,8 @@ class Angle(LS):
                 at_const = True
             else:
                 #set the easting and northing values of the 
-                e_at = self.x_0[at_col,0]
-                n_at = self.x_0[at_col+1,0]
+                e_at = LS.x_0[at_col,0]
+                n_at = LS.x_0[at_col+1,0]
                                                              
             #__________________________________________________________________________               
             #constants for this line    

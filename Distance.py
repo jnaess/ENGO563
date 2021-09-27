@@ -102,8 +102,8 @@ class Distance(LS):
                 from_const = True
             else:
                 #sets easting and northing values from the froms
-                e_from = self.x_0[from_col,0]
-                n_from = self.x_0[from_col+1,0]
+                e_from = LS.x_0[from_col,0]
+                n_from = LS.x_0[from_col+1,0]
             
             to_col = self.find_col(self.d_symbol, tos[i])
             if to_col == -1:
@@ -115,14 +115,14 @@ class Distance(LS):
                 to_const = True
             else:
                 #set the easting and northing values of the 
-                e_to = self.x_0[to_col,0]
-                n_to = self.x_0[to_col+1,0]
+                e_to = LS.x_0[to_col,0]
+                n_to = LS.x_0[to_col+1,0]
                                                              
             #__________________________________________________________________________
             
-            
-            #print("E_from: "+str(e_from)+" N_from:"+str(n_from))
-            #print("E_to: "+str(e_to)+" N_to: "+str(n_to))
+            if self.debugging:
+                print("E_from: "+str(e_from)+" N_from:"+str(n_from))
+                print("E_to: "+str(e_to)+" N_to: "+str(n_to))
             
             
             dist = m.sqrt((e_from-e_to)**2+(n_from-n_to)**2)
@@ -197,8 +197,8 @@ class Distance(LS):
                 from_const = True
             else:
                 #sets easting and northing values from the froms
-                e_from = self.x_0[from_col,0]
-                n_from = self.x_0[from_col+1,0]
+                e_from = LS.x_0[from_col,0]
+                n_from = LS.x_0[from_col+1,0]
             
             to_col = self.find_col(self.d_symbol, tos[i])
             if to_col == -1:
@@ -210,18 +210,15 @@ class Distance(LS):
                 to_const = True
             else:
                 #set the easting and northing values of the 
-                e_to = self.x_0[to_col,0]
-                n_to = self.x_0[to_col+1,0]
-                                                             
-            #__________________________________________________________________________    
+                e_to = LS.x_0[to_col,0]
+                n_to = LS.x_0[to_col+1,0]
+ #__________________________________________________________________________    
             
             dist = m.sqrt((e_from-e_to)**2+(n_from-n_to)**2)
             
-            #this is where the values are assigned______________________________________                
+            #this is where the values areassigned______________________________________                
                 #self.A[i,to_col] = delta + 1
             self.l_0[i,0] = dist
             #_____________________________________________________________________________
-            
-            
-            
+
             i = i + 1

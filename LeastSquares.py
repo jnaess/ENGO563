@@ -8,6 +8,7 @@ class LS():
     """
         Holds the universal values needed to integrate the different LS adjustments into one
     """
+    x_0 = []
     def __init__(self, file_name = "coords.txt", debugging = False):
         """
         Desc:
@@ -43,7 +44,7 @@ class LS():
         #currently only formatted for 2D
 
         self.u_list = []
-        self.x_0 = []
+        LS.x_0 = []
         self.c = []
         #pretty sure datums aren't actually used
         self.datums = []
@@ -57,8 +58,8 @@ class LS():
                 self.u_list.append(row[0]+"_N")
 
                 #add unknown values in order of x, y
-                self.x_0.append(row[1])
-                self.x_0.append(row[2])
+                LS.x_0.append(row[1])
+                LS.x_0.append(row[2])
             else: #then they are "n" --> knowns
                 #known name
                 self.datums.append(row[0]+"_E")
@@ -68,7 +69,7 @@ class LS():
                 self.c.append(row[1])
                 self.c.append(row[2])
                 
-        self.x_0 = t(mat(self.x_0))
+        LS.x_0 = t(mat(LS.x_0))
         self.c = t(mat(self.c))
         self.u = len(self.u_list)
         

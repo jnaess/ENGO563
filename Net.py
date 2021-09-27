@@ -66,10 +66,10 @@ class Network(LS):
         self.covariance()
         
         #set up apriori
-        self.apriori = 1
+        self.apriori = 1.5
         
         #set up weight matrix
-        self.P = inv(self.Cl)
+        self.P = self.apriori**2 * inv(self.Cl)
         
                 
     def final_matrices(self):
@@ -89,8 +89,8 @@ class Network(LS):
         self.r_hat = mm(self.A,self.S_hat) + self.w_0
         self.l_hat = self.obs + self.r_hat
         self.a_post = mm(t(self.r_hat),mm(self.P,self.r_hat)/(self.n-self.u))[0,0]
-        self.uvf = self.a_post / self.apriori
-        self.Cx = self.a_post*inv(mm(t(self.A),mm(self.P,self.A)))
+        self.uvf = self.a_post**2 / self.apriori**2
+        self.Cx = self.a_post**2 * inv(mm(t(self.A),mm(self.P,self.A)))
         self.Cl = mm(self.A,mm(self.Cx,t(self.A)))
         self.Cr = self.a_post*inv(self.P)-self.Cl
         
@@ -106,23 +106,51 @@ class Network(LS):
         
         i = 0
         
+        self.w_0 = mat(np.zeros((self.n, 1)))
+        self.S_hat = mat(np.zeros((self.n, 1)))
+        self.x_hat = mat(np.zeros((self.n, 1)))
+        
         while self.not_met:
+            i = i + 1
+            print("LSA iteration: " + str(i))
+            print("x_0: ")
+            print(LS.x_0)
+            
             #l_0
             self.obs_0()
+            
+            #update l_0 and A
+            self.update_values()
 
             #misclosure
+            
             self.w_0 =  self.l_0 - self.obs
 
             #S_hat
+            
             self.S_hat = -mm(inv(mm(t(self.A),mm(self.P,self.A))),mm(t(self.A),mm(self.P,self.w_0)))
 
+            print("l_0: ")
+            print(self.l_0)
+            
             #x_hat
-            self.x_hat = self.x_0 + self.S_hat
-            
+            self.x_hat = LS.x_0 + self.S_hat
+           
+                
             #update x_0
-            self.x_0 = self.x_hat
+            LS.x_0 = self.x_hat
+          
+            print("S_hat:")
+            print(self.S_hat)
+            print("x_hat: ")
+            print(self.x_hat)
+            print("A: ")
+            print(self.A)
             
-            i = i + 1
+            
+            
+            
+            
             
             self.convergence(i)
         
@@ -139,19 +167,20 @@ class Network(LS):
             self.not_met --> False if the criterea is met
         """
         #max 10 iterations
-        if i > 1:
+        if i > 3:
             self.not_met = False
             
         #minimum self.S_hat to be under .001m
+        """
         not_under = False
         for key in self.S_hat:
-            if key[0,0] > .0001:
+            if abs(key[0,0]) > .0001:
                 #this means the criterea was not met for atleast one of the unknowns
                 not_under = True
 
         if not not_under:
             #then all things were under .0001m in change and therefore the criterea was met
-            self.not_met = False
+            self.not_met = False"""
         
         
     def covariance(self):
@@ -165,7 +194,7 @@ class Network(LS):
         self.Cl = mat(np.zeros((self.n, self.n)))
         
         for i in range(0,self.n):
-            self.Cl[i,i] = self.errs[i]*self.errs[i]
+            self.Cl[i,i] = self.errs[i]**2
             
     def design(self):
         """
@@ -176,10 +205,10 @@ class Network(LS):
            self.A
         """
         self.A = mat(np.zeros((self.n, self.u)))
-        
+                    
         temp = []
-        for obs in self.models:
-            temp.append(obs.A)
+        for model in self.models:
+            temp.append(model.A)
         self.A = np.vstack(temp)
         
     def n_mat(self):
@@ -197,7 +226,7 @@ class Network(LS):
 
         """
         #adds constants and unknowns together and solves for values
-        self.w = mm(self.A,self.x_0) - self.obs
+        self.w = mm(self.A,LS.x_0) - self.obs
            
            #____________for non linear this will need to change______
     def u_mat(self):
@@ -220,10 +249,30 @@ class Network(LS):
         """
         
         self.l_0 = mat(np.zeros((self.n, 1)))
-        
+                    
         temp = []
         for obs in self.models:
             temp.append(obs.l_0)
         self.l_0 = np.vstack(temp)
         
-        
+    def update_values(self):
+        """
+        Desc:
+            Updates x_0 and design and l_0
+        Input:
+            Uses most recent x_hat value
+        Output:
+            none:
+        """
+        #update models
+        for model in self.models:
+            #model.x_0 = self.x_0
+            
+            model.obs_0()
+            
+            #update design matrix
+            model.set_design()
+           
+        #update within network
+        self.design()
+        self.obs_0()

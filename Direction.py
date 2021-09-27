@@ -180,4 +180,13 @@ class Horizontal_Direction(LS):
             
         self.l_0 = t(mat(np.array(self.l_0)))
         
+    def update_obs_0(self, x_0):
+        """
+        Desc:
+            Updates the self.df to have better estimated values for unknowns
+        Input:
+        Output:
+        """
+        
+        
         
