@@ -36,7 +36,7 @@ class PostAdjustmentTester(Tables):
         Input:
             alpha: to generate the two confidence intervals. Be sure to make sure that these values are generated in the respective dataframe of values, otherwise they won't be found :-)
             self.u: # of unknowns
-            self.n: # of knowns
+            self.n: # of observations
             self.a_post: final computed a posteriori variance factor
             self.apriori: initial apriori variance factor
         Output:
@@ -70,6 +70,10 @@ class PostAdjustmentTester(Tables):
             Determines whether there is statistical signifiance to beleive the final estimated value of parameters
         Input:
             alpha: to generate the two confidence intervals. Be sure to make sure that these values are generated in the respective dataframe of values, otherwise they won't be found :-)
+            self.n: # of observations
+            self.x_hat
+            self.u_list: for labelling
+            self.Cx: for extracting std dev values of parameters
         Output:
             retrunds dataframe of values [Unknown 	Final Value 	Value Standard Deviation 	Test Value 	Indicated Significance 	Alpha Tested 	Confidence Level 	Test Bounds]
         """
@@ -80,7 +84,6 @@ class PostAdjustmentTester(Tables):
         low = stu.ppf(alpha, self.r)
         
         #final paramter values
-        self.x_hat
         xs = []
         
         #unknown names in string format
@@ -146,6 +149,8 @@ class PostAdjustmentTester(Tables):
         Input:
             self.r_hat: residuals
             alpha = .05: to find confidence level
+            self.Cr: extracting std of residuals
+            self.n: number of observations
         Output:
             prints whether the test passed and the reccomended interpretation
         """
@@ -199,6 +204,8 @@ class PostAdjustmentTester(Tables):
             Conducts the local test on the residuals, aka blunder detection
         Input:
             alpha = .01: for 99% confidence of a blunder
+            self.Cr: for extracting std of residuals
+            self.r_hat: for extracting residuals
         Output:
             Returns a dataframe with columns ["Observation", "Outlier", "Test Value", "Test Bounds"]
         
