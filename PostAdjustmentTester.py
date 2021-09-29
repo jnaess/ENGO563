@@ -71,6 +71,7 @@ class PostAdjustmentTester(Tables):
         Input:
             alpha: to generate the two confidence intervals. Be sure to make sure that these values are generated in the respective dataframe of values, otherwise they won't be found :-)
         Output:
+            retrunds dataframe of values [Unknown 	Final Value 	Value Standard Deviation 	Test Value 	Indicated Significance 	Alpha Tested 	Confidence Level 	Test Bounds]
         """
         #set up DOF (r)
         self.r = self.n - self.u
@@ -146,8 +147,9 @@ class PostAdjustmentTester(Tables):
             self.r_hat: residuals
             alpha = .05: to find confidence level
         Output:
+            prints whether the test passed and the reccomended interpretation
         """
-        #stardize residuals
+        #normalize residuals
         norm_r = []
         
         for i in range(0,self.n):            
@@ -190,3 +192,54 @@ class PostAdjustmentTester(Tables):
             print("The Semi-Global, goodness-of-fit test on the residuals **Passed**")
             print("There is no sign of outliers or functional model errors")
         #plt.hist(norm_r, m)
+        
+    def blunder_detection(self, alpha = .01):
+        """
+        Desc:
+            Conducts the local test on the residuals, aka blunder detection
+        Input:
+            alpha = .01: for 99% confidence of a blunder
+        Output:
+            Returns a dataframe with columns ["Observation", "Outlier", "Test Value", "Test Bounds"]
+        
+        """
+        #statistical test values
+        low = st.norm.ppf(alpha/2)
+        high = st.norm.ppf(1-alpha/2)
+        
+        #normalize residuals (test statistic)
+        y = []
+        
+        #list of Yes or No outliers
+        outlier = []
+        
+        #observations
+        observations = []
+        
+        #test bounds
+        bounds = []
+        
+        for i in range(0,self.n):  
+            #for DF
+            observations.append(i)
+            bounds.append(str([low, high]))
+            
+            y.append(self.r_hat[i,0]/m.sqrt(self.Cr[i,i]))
+            
+            if y[i] > low and y[i] < high:
+                #passes test --> not an outlier
+                outlier.append("No")
+            else:
+                outlier.append("Yes")
+                
+        dic = {
+            "Observation": observations,
+            "Outlier": outlier,
+            "Test Value": y,
+            "Test Bounds": bounds
+        }
+        return pd.DataFrame.from_dict(dic)
+                
+            
+        
+            
