@@ -11,8 +11,9 @@ from LeastSquares import LS
 from Level import Delta
 from Tables import Tables
 
-from scipy import stats
+from scipy import stats as st
 from scipy.stats import t as stu
+from scipy.stats import chi2
 
 
 
@@ -136,3 +137,56 @@ class PostAdjustmentTester(Tables):
             }
         #return dict_list
         return pd.DataFrame.from_dict(dict_list)
+    
+    def semi_global_residuals(self, alpha = .05):
+        """
+        Desc:
+            Conducts the semi global test on residuals, also known as the gooness-of-fit or normality test on residuals
+        Input:
+            self.r_hat: residuals
+            alpha = .05: to find confidence level
+        Output:
+        """
+        #stardize residuals
+        norm_r = []
+        
+        for i in range(0,self.n):            
+            norm_r.append(self.r_hat[i,0]/m.sqrt(self.Cr[i,i]))
+            
+        #number of bins
+        M = round(m.sqrt(self.n))
+        
+        counts, bins = np.histogram(norm_r, bins = M)
+        
+        #compute estimated number of residuals per bin
+        e = []
+        for i in range(M):
+            #get probability of total bin
+            p_start = st.norm.cdf(bins[i])
+            p_end = st.norm.cdf(bins[i+1])
+            p = p_end - p_start
+            
+            #append total number of expected residuals
+            e.append(p*self.n)
+            
+        #compute X_2 for each bin
+        chis = []
+        for i in range(M):
+            chis.append((e[i]-counts[i])**2/e[i])
+            
+        #sum all chis for test statistic y
+        y = sum(chis)
+        
+        #conduct statistical test
+        dof = M - 1
+        prob = 1 - alpha
+        chi = chi2.ppf(prob, dof)
+        
+        print("{} tested with chi_square of {} ".format(y, chi))
+        if y > chi:
+            print("The Semi-Global, goodness-of-fit test on the residuals **Failled**")
+            print("There is a sign that either there are outliers or the functional model was not appropriate for the data set")
+        else:
+            print("The Semi-Global, goodness-of-fit test on the residuals **Passed**")
+            print("There is no sign of outliers or functional model errors")
+        #plt.hist(norm_r, m)
