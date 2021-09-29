@@ -8,11 +8,12 @@ import numpy as np
 import pandas as pd
 from LeastSquares import LS
 from Level import Delta
+from PostAdjustmentTester import PostAdjustmentTester
 
 
 
 
-class Network(LS):
+class Network(LS, PostAdjustmentTester):
     """
     Build to run the least squares adjustment and set up the overall network
     """
@@ -26,6 +27,7 @@ class Network(LS):
         Output:
         """
         LS.__init__(self)
+        PostAdjustmentTester.__init__(self)
         self.models = models
         
         self.initialize_variables()
@@ -164,6 +166,56 @@ class Network(LS):
         
         #print("LSA passed in: " + str(i) + " iterations")
         self.final_matrices()
+    
+    def error_ellipses(self):
+        """
+        Desc:
+            generates the error ellipses, minor, major, bearing_major
+            **must already have self.Cx generates**
+            **assumes Xa, Ya, Xb, Yb, Xc, Yc etc in the Cx diagonal**
+        Input:
+        Output:
+        """
+        self.u
+        ellipses = []
+        for i in range(0,self.Cx.shape[0],2):
+            q11 = self.Cx[i,i]
+            q12 = self.Cx[i,i+1]
+            q21 = self.Cx[i+1,i]
+            q22 = self.Cx[i+1,i+1]
+            ellipses.append(self.ellipse(q11, q12, q21, q22))
+            
+        return ellipses
+            
+    def ellipse(self, q11, q12, q21, q22):
+        """
+        Desc:
+            Calculates the error ellipse, returns back a dataframe of the values
+        Input:
+            q11, 
+            q12, 
+            q21, 
+            q22
+        Output:
+            {
+            "minor": float,
+            "major": float,
+            "major_orientation": radians
+            }
+        """
+        minor = m.sqrt(abs((q11 + q22 - m.sqrt((q11-q22)**2+4*(q12**2)))/2))
+        major = m.sqrt(abs((q11 + q22 + m.sqrt((q11-q22)**2+4*(q12**2)))/2))
+        
+        major_orientation = m.atan(q12/(major**2-q22))
+        
+        return {
+            "minor": minor,
+            "major": major,
+            "major_orientation": major_orientation
+            }
+        
+        
+            
         
     def convergence(self,i):
         """
